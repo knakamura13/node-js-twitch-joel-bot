@@ -55,8 +55,8 @@ const isWithinTimeRange = () => {
     const startTime = new Date();
     const endTime = new Date();
 
-    startTime.setHours(8, 50, 0, 0);
-    endTime.setHours(13, 0, 0, 0);
+    startTime.setHours(8, 50, 0, 0);  // 8:50 am
+    endTime.setHours(14, 0, 0, 0); // 2:00 pm
 
     const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; // Monday to Friday
 

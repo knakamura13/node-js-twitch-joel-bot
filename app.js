@@ -55,8 +55,8 @@ const isWithinTimeRange = () => {
     const startTime = new Date();
     const endTime = new Date();
 
-    startTime.setHours(8, 50, 0, 0);  // 8:50 am
-    endTime.setHours(14, 0, 0, 0); // 2:00 pm
+    startTime.setHours(8, 45, 0, 0);  // 8:45 am
+    endTime.setHours(15, 0, 0, 0); // 3:00 pm
 
     const pstNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
     const pstStartTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));

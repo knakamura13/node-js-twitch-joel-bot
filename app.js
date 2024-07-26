@@ -21,6 +21,7 @@
 import colors from 'chalk'
 import dotenv from 'dotenv'
 import TwitchJs from 'twitch-js'
+import moment from 'moment-timezone';
 
 dotenv.config()
 
@@ -51,20 +52,13 @@ const getFormattedTime = () =>
 
 /** Checks if the current time is between 8:50am and 1pm on weekdays. */
 const isWithinTimeRange = () => {
-    const now = new Date();
-    const startTime = new Date();
-    const endTime = new Date();
+    const now = moment().tz('America/Los_Angeles');
+    const startTime = moment.tz('America/Los_Angeles').set({ hour: 8, minute: 45, second: 0, millisecond: 0 });
+    const endTime = moment.tz('America/Los_Angeles').set({ hour: 15, minute: 0, second: 0, millisecond: 0 });
 
-    startTime.setHours(8, 45, 0, 0);  // 8:45 am
-    endTime.setHours(15, 0, 0, 0); // 3:00 pm
+    const isWeekday = now.day() >= 1 && now.day() <= 5; // Monday to Friday
 
-    const pstNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const pstStartTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const pstEndTime = new Date(endTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-
-    const isWeekday = pstNow.getDay() >= 1 && pstNow.getDay() <= 5; // Monday to Friday
-
-    return isWeekday && pstNow >= pstStartTime && pstNow <= pstEndTime;
+    return isWeekday && now.isBetween(startTime, endTime);
 }
 
 /** Send a Joel message. */

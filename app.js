@@ -58,6 +58,9 @@ const isWithinTimeRange = () => {
     startTime.setHours(8, 50, 0, 0);  // 8:50 am
     endTime.setHours(14, 0, 0, 0); // 2:00 pm
 
+    console.log('Timezone offset:', now.getTimezoneOffset() / 60);
+    console.log('Now:', now.toLocaleString())
+
     const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; // Monday to Friday
 
     return isWeekday && now >= startTime && now <= endTime;

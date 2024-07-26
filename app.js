@@ -3,7 +3,7 @@
  *
  * This script sets up a Twitch chatbot that sends periodic messages to a specified channel.
  * The bot only sends messages under the following conditions:
- * 1. The current time is between 8:50am and 1pm.
+ * 1. The current time is between 8:45am and 2pm.
  * 2. The stream is active, meaning there has been at least one chat message from a user (non-bot) in the past 60 seconds.
  *
  * The script also listens to incoming chat messages and updates the stream's activity status based on received messages.
@@ -55,7 +55,7 @@ const getFormattedTime = () =>
 const isWithinTimeRange = () => {
     const now = moment().tz('America/Los_Angeles');
     const startTime = moment.tz('America/Los_Angeles').set({ hour: 8, minute: 45, second: 0, millisecond: 0 });
-    const endTime = moment.tz('America/Los_Angeles').set({ hour: 15, minute: 0, second: 0, millisecond: 0 });
+    const endTime = moment.tz('America/Los_Angeles').set({ hour: 14, minute: 0, second: 0, millisecond: 0 });
 
     const isWeekday = now.day() >= 1 && now.day() <= 5; // Monday to Friday
 
@@ -69,6 +69,7 @@ function sendJoelMessage() {
         for (const channel of TWITCH_PREFERENCES.channels) {
             console.log(`${colors.gray(getFormattedTime())} '${channel}': "${message}".`);
             chat.send(`PRIVMSG #${channel} :${message}`);
+            lastMessageUsername = TWITCH_PREFERENCES.credentials.username;
         }
     }
 }
@@ -76,11 +77,16 @@ function sendJoelMessage() {
 /** Checks for chat inactivity. */
 function checkInactivity() {
     const currentTime = Date.now();
+    const wasActive = streamIsActive;
     streamIsActive = currentTime - lastMessageTimestamp <= INACTIVITY_THRESHOLD_SECONDS * 1000;
 
     // Check if the last message was sent by the bot
     if (lastMessageUsername.toLowerCase() === TWITCH_PREFERENCES.credentials.username.toLowerCase()) {
         streamIsActive = false;
+    }
+
+    if (wasActive !== streamIsActive) {
+        console.log(`${colors.gray(getFormattedTime())} Stream activity status changed: ${streamIsActive ? 'active' : 'inactive'}.`);
     }
 }
 
@@ -109,8 +115,13 @@ chat.on('PRIVMSG', (msg) => {
         return;
     }
 
+    const wasActive = streamIsActive;
     lastMessageTimestamp = Date.now();
     streamIsActive = true;
+
+    if (wasActive !== streamIsActive) {
+        console.log(`${colors.gray(getFormattedTime())} Stream activity status changed: ${streamIsActive ? 'active' : 'inactive'}.`);
+    }
 });
 
 chat.connect()

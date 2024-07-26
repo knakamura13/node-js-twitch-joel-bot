@@ -39,7 +39,7 @@ const USER_IGNORE_LIST = ['nightbot'];
 
 let streamIsActive = true;
 let lastMessageTimestamp = Date.now();
-let lastTwoMessages = [];
+let lastMessageUsername = '';
 
 const chat = new TwitchJs.Chat({
     username: TWITCH_PREFERENCES.credentials.username,
@@ -78,8 +78,8 @@ function checkInactivity() {
     const currentTime = Date.now();
     streamIsActive = currentTime - lastMessageTimestamp <= INACTIVITY_THRESHOLD_SECONDS * 1000;
 
-    // Check if the last two messages were sent by the bot
-    if (lastTwoMessages.length === 2 && lastTwoMessages.every(username => username === TWITCH_PREFERENCES.credentials.username.toLowerCase())) {
+    // Check if the last message was sent by the bot
+    if (lastMessageUsername.toLowerCase() === TWITCH_PREFERENCES.credentials.username.toLowerCase()) {
         streamIsActive = false;
     }
 }
@@ -103,18 +103,14 @@ function startJoeling() {
 chat.on('PRIVMSG', (msg) => {
     msg.channel = msg.channel.replace('#', '');
 
+    lastMessageUsername = msg.username;
+
     if (shouldMessageBeIgnored(msg.channel, msg.username, msg.message, msg.isModerator)) {
         return;
     }
 
     lastMessageTimestamp = Date.now();
     streamIsActive = true;
-
-    // Update the last two messages array
-    lastTwoMessages.push(msg.username.toLowerCase());
-    if (lastTwoMessages.length > 2) {
-        lastTwoMessages.shift();
-    }
 });
 
 chat.connect()

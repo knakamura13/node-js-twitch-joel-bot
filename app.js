@@ -33,10 +33,10 @@ const TWITCH_PREFERENCES = {
 };
 
 const JOEL_INTERVAL_SECONDS = 30.1;
-const INACTIVITY_THRESHOLD_SECONDS = 60;
+const INACTIVITY_THRESHOLD_SECONDS = 600;
 const USER_IGNORE_LIST = ['nightbot'];
 
-let streamIsActive = false;
+let streamIsActive = true;
 let lastMessageTimestamp = Date.now();
 
 const chat = new TwitchJs.Chat({
@@ -49,7 +49,7 @@ const chat = new TwitchJs.Chat({
 const getFormattedTime = () =>
     `[${new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })}]`
 
-/** Checks if the current time is between 8:50am and 1pm. */
+/** Checks if the current time is between 8:50am and 1pm on weekdays. */
 const isWithinTimeRange = () => {
     const now = new Date();
     const startTime = new Date();
@@ -58,7 +58,9 @@ const isWithinTimeRange = () => {
     startTime.setHours(8, 50, 0, 0);
     endTime.setHours(13, 0, 0, 0);
 
-    return now >= startTime && now <= endTime;
+    const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; // Monday to Friday
+
+    return isWeekday && now >= startTime && now <= endTime;
 }
 
 /** Send a Joel message. */

@@ -18,12 +18,12 @@
  * - startJoeling(): Initializes the periodic message sending and inactivity checking.
  * - chat.on('PRIVMSG', ...): Event listener for incoming chat messages that updates the last message timestamp and stream activity status.
  */
-import colors from 'chalk'
-import dotenv from 'dotenv'
-import TwitchJs from 'twitch-js'
+import colors from 'chalk';
+import dotenv from 'dotenv';
+import TwitchJs from 'twitch-js';
 import moment from 'moment-timezone';
 
-dotenv.config()
+dotenv.config();
 
 const TWITCH_PREFERENCES = {
     channels: [process?.env?.JOEL_CHANNEL ?? 'northernlion'],
@@ -48,8 +48,7 @@ const chat = new TwitchJs.Chat({
 });
 
 /** Returns the current time as a string, formatted with hours, minutes, seconds, and period. */
-const getFormattedTime = () =>
-    `[${new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })}]`
+const getFormattedTime = () => `[${moment().tz('America/Los_Angeles').format('h:mm:ss A')}]`;
 
 /** Checks if the current time is between 8:50am and 1pm on weekdays. */
 const isWithinTimeRange = () => {
@@ -60,7 +59,7 @@ const isWithinTimeRange = () => {
     const isWeekday = now.day() >= 1 && now.day() <= 5; // Monday to Friday
 
     return isWeekday && now.isBetween(startTime, endTime);
-}
+};
 
 /** Send a Joel message. */
 function sendJoelMessage() {
@@ -93,10 +92,12 @@ function checkInactivity() {
 /** Determines if the message should be ignored. */
 function shouldMessageBeIgnored(channel, username, message, isModerator) {
     // Ignore if the message is from a bot, self, a moderator, or is a command
-    return isModerator
-        || USER_IGNORE_LIST.includes(username.toLowerCase())
-        || username.toLowerCase() === TWITCH_PREFERENCES.credentials.username.toLowerCase()
-        || message.charAt(0) === '!';
+    return (
+        isModerator ||
+        USER_IGNORE_LIST.includes(username.toLowerCase()) ||
+        username.toLowerCase() === TWITCH_PREFERENCES.credentials.username.toLowerCase() ||
+        message.charAt(0) === '!'
+    );
 }
 
 function startJoeling() {
@@ -104,7 +105,6 @@ function startJoeling() {
     setInterval(sendJoelMessage, JOEL_INTERVAL_SECONDS * 1000);
     setInterval(checkInactivity, INACTIVITY_THRESHOLD_SECONDS * 1000);
 }
-
 
 chat.on('PRIVMSG', (msg) => {
     msg.channel = msg.channel.replace('#', '');
@@ -131,4 +131,5 @@ chat.connect()
         }
         console.clear();
         console.log(colors.greenBright(`Connection established as @${TWITCH_PREFERENCES.credentials.username}.`));
-    }).finally(startJoeling);
+    })
+    .finally(startJoeling);

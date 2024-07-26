@@ -58,12 +58,13 @@ const isWithinTimeRange = () => {
     startTime.setHours(8, 50, 0, 0);  // 8:50 am
     endTime.setHours(14, 0, 0, 0); // 2:00 pm
 
-    console.log('Timezone offset:', now.getTimezoneOffset() / 60);
-    console.log('Now:', now.toLocaleString())
+    const pstNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const pstStartTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const pstEndTime = new Date(endTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
-    const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; // Monday to Friday
+    const isWeekday = pstNow.getDay() >= 1 && pstNow.getDay() <= 5; // Monday to Friday
 
-    return isWeekday && now >= startTime && now <= endTime;
+    return isWeekday && pstNow >= pstStartTime && pstNow <= pstEndTime;
 }
 
 /** Send a Joel message. */

@@ -37,26 +37,27 @@ const JOEL_INTERVAL_DEFAULT_SECONDS = 30.1;
 const JOEL_INTERVAL_SLOW_SECONDS = 90;
 const INACTIVITY_THRESHOLD_SECONDS = 60;
 const USER_IGNORE_LIST = ['nightbot'];
+const TIME_ZONE_PST = 'America/Los_Angeles';
 
 let streamIsActive = true;
 let lastMessageTimestamp = Date.now();
 let lastMessageUsername = '';
 let messageInterval = null;
 
+// noinspection JSValidateTypes
 const chat = new TwitchJs.Chat({
     username: TWITCH_PREFERENCES.credentials.username,
-    token: TWITCH_PREFERENCES.credentials.token,
-    log: { level: 'error' }
+    token: TWITCH_PREFERENCES.credentials.token
 });
 
 /** Returns the current time as a string, formatted with hours, minutes, seconds, and period. */
-const getFormattedTime = () => `[${moment().tz('America/Los_Angeles').format('h:mm:ss A')}]`;
+const getFormattedTime = () => `[${moment().tz(TIME_ZONE_PST).format('h:mm:ss A')}]`;
 
 /** Checks if the current time is between 8:50am and 1pm on weekdays. */
 const isWithinTimeRange = () => {
-    const now = moment().tz('America/Los_Angeles');
-    const startTime = moment.tz('America/Los_Angeles').set({ hour: 8, minute: 45, second: 0, millisecond: 0 });
-    const endTime = moment.tz('America/Los_Angeles').set({ hour: 14, minute: 0, second: 0, millisecond: 0 });
+    const now = moment().tz(TIME_ZONE_PST);
+    const startTime = moment.tz(TIME_ZONE_PST).set({ hour: 8, minute: 45, second: 0, millisecond: 0 });
+    const endTime = moment.tz(TIME_ZONE_PST).set({ hour: 14, minute: 0, second: 0, millisecond: 0 });
 
     const isWeekday = now.day() >= 1 && now.day() <= 5; // Monday to Friday
 
@@ -103,8 +104,8 @@ function shouldMessageBeIgnored(channel, username, message, isModerator) {
 }
 
 function updateMessageInterval() {
-    const now = moment().tz('America/Los_Angeles');
-    const changeTime = moment.tz('America/Los_Angeles').set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+    const now = moment().tz(TIME_ZONE_PST);
+    const changeTime = moment.tz(TIME_ZONE_PST).set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
 
     clearInterval(messageInterval);
 

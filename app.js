@@ -33,13 +33,15 @@ const TWITCH_PREFERENCES = {
     }
 };
 
-const JOEL_INTERVAL_SECONDS = 30.1;
+const JOEL_INTERVAL_DEFAULT_SECONDS = 30.1;
+const JOEL_INTERVAL_SLOW_SECONDS = 90;
 const INACTIVITY_THRESHOLD_SECONDS = 60;
 const USER_IGNORE_LIST = ['nightbot'];
 
 let streamIsActive = true;
 let lastMessageTimestamp = Date.now();
 let lastMessageUsername = '';
+let messageInterval = null;
 
 const chat = new TwitchJs.Chat({
     username: TWITCH_PREFERENCES.credentials.username,
@@ -100,9 +102,21 @@ function shouldMessageBeIgnored(channel, username, message, isModerator) {
     );
 }
 
+function updateMessageInterval() {
+    const now = moment().tz('America/Los_Angeles');
+    const changeTime = moment.tz('America/Los_Angeles').set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+
+    clearInterval(messageInterval);
+
+    if (now.isBefore(changeTime)) {
+        messageInterval = setInterval(sendJoelMessage, JOEL_INTERVAL_SLOW_SECONDS * 1000);
+    } else {
+        messageInterval = setInterval(sendJoelMessage, JOEL_INTERVAL_DEFAULT_SECONDS * 1000);
+    }
+}
+
 function startJoeling() {
-    sendJoelMessage();
-    setInterval(sendJoelMessage, JOEL_INTERVAL_SECONDS * 1000);
+    setInterval(updateMessageInterval, 60 * 1000); // Update the interval every minute to check for stream start
     setInterval(checkInactivity, INACTIVITY_THRESHOLD_SECONDS * 1000);
 }
 

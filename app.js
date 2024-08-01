@@ -42,10 +42,11 @@ let streamIsActive = true;
 let lastMessageTimestamp = Date.now();
 let lastMessageUsername = '';
 
-// noinspection JSValidateTypes
+// noinspection JSValidateTypes, JSCheckFunctionSignatures
 const chat = new TwitchJs.Chat({
     username: TWITCH_PREFERENCES.credentials.username,
-    token: TWITCH_PREFERENCES.credentials.token
+    token: TWITCH_PREFERENCES.credentials.token,
+    log: { level: 'error' }
 });
 
 /** Returns the current time as a string, formatted with hours, minutes, seconds, and period. */
